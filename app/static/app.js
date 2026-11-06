@@ -327,7 +327,7 @@ function scriptsPage() {
       this.errors = []; this.warnings = []; this.okMessage = "";
       this.preview = "";
       this.raw = JSON.stringify({
-        version: 2, name: "", language: "zh",
+        version: 2, name: "新剧本", language: "zh",
         roles: [{
           id: "character_1", name: "角色1", presence: "on_screen",
           initially_visible: true, position: "center", voice: "",
@@ -335,7 +335,10 @@ function scriptsPage() {
         camera: { framing: "medium_close_up", movement: "locked", perspective: "observer" },
         look: "", setting: "",
         constraints: "",
-        target_duration_seconds: 10, continuation_overlap_frames: 0,
+        // Two seconds: the contract rejects a target that is much longer
+        // than the events need ("too long for the event density"), and a
+        // skeleton with one short line is exactly that.
+        target_duration_seconds: 2, continuation_overlap_frames: 0,
         source_script: "角色1：你好",
         shots: [{
           id: "scene_01", duration_seconds: 5,

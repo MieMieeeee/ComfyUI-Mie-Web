@@ -53,6 +53,16 @@ def test_pictures_count_the_on_screen_roles_only(plugin_root):
     assert sampler["inputs"]["ref_audios.ref_audio_1"] == ["902", 12]
 
 
+def test_the_finished_file_is_named_after_the_run(plugin_root):
+    """The Assemble node's filename must follow the run name, or the file
+    lands under one name while the run lives under another."""
+    graph = workflow.build("测试剧本", SCRIPT, {"character_1": "甲"},
+                           run_name="sb_web_20261107")
+    assembler = next(n for n in graph.values()
+                     if n["class_type"].endswith("ChainAssemble|MieH3"))
+    assert assembler["inputs"]["filename"].startswith("sb_web_20261107")
+
+
 def test_the_preset_is_not_mutated_between_builds(plugin_root):
     workflow.build("测试剧本", SCRIPT, {"character_1": "甲"})
     second = workflow.build("测试剧本", SCRIPT, {"character_1": "乙"})

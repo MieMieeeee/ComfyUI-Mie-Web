@@ -127,6 +127,16 @@ def build(script_name: str, script_json: dict,
     plan_node["inputs"]["height"] = height
     plan_node["inputs"]["default_steps"] = steps
     plan_node["inputs"]["default_duration_seconds"] = duration
+    effective_run_name = plan_node["inputs"]["run_name"]
+
+    # The Assemble node names the finished file. Leaving the preset's name
+    # on it means the file lands under one name and the run lives under
+    # another, and the two stop being findable by the same key.
+    assembler = next(
+        (n for n in nodes.values()
+         if n["class_type"].endswith("ChainAssemble|MieH3")), None)
+    if assembler is not None:
+        assembler["inputs"]["filename"] = effective_run_name + "_%date:yyyy-MM-dd%"
 
     # The sampler: pictures over the on-screen roles, voices over every
     # wired character in cast order.
