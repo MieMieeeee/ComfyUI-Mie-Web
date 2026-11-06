@@ -199,3 +199,44 @@ def _kind_of(path: pathlib.Path) -> str:
 def media_root() -> pathlib.Path:
     """The directory the /media route serves from."""
     return config.COMFYUI_ROOT / "output"
+
+
+def recent_runs(limit: int = 20) -> list[dict]:
+    """The finished runs on disk, newest first.
+
+    The web app's own job table lives in memory, so a restart empties it -
+    but the renders do not go anywhere. They are indexed from the chain
+    directory instead, so the page still shows what was made.
+    """
+    root = config.COMFYUI_ROOT / "output" / "h3_chains"
+    if not root.is_dir():
+        return []
+    runs = []
+    for run_dir in root.iterdir():
+        if not run_dir.is_dir():
+            continue
+        final = run_dir / "final"
+        videos = sorted(final.glob("*.mp4")) if final.is_dir() else []
+        images = sorted(final.glob("*.png")) if final.is_dir() else []
+        clips = sorted((run_dir / "segments").glob("*.mp4")) \
+            if (run_dir / "segments").is_dir() else []
+        if not videos and not clips:
+            continue
+        manifest = run_dir / "manifest.json"
+        shots = []
+        try:
+            payload = json.loads(manifest.read_text(encoding="utf-8"))
+            shots = payload.get("shots") or payload.get("clips") or []
+        except (FileNotFoundError, json.JSONDecodeError, AttributeError):
+            pass
+        stamp = max((p.stat().st_mtime for p in (videos + clips)), default=0)
+        runs.append({
+            "run_name": run_dir.name,
+            "status": "success" if videos else "running",
+            "finished_at": stamp,
+            "video": str(videos[0].relative_to(config.COMFYUI_ROOT / "output")).replace("\\", "/") if videos else "",
+            "clips": len(clips),
+            "shots": len(shots),
+        })
+    runs.sort(key=lambda r: r["finished_at"], reverse=True)
+    return runs[:limit]

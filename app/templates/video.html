@@ -62,7 +62,7 @@
     <div class="split-detail">
       <div class="card" x-show="jobs.length">
         <div class="card-head"><h3>任务</h3></div>
-        <template x-for="j in jobs" :key="j.job_id">
+        <template x-for="j in jobs" :key="j.job_id || j.run_name">
           <div class="job-row">
             <div>
               <div class="cell-strong" x-text="j.run_name"></div>

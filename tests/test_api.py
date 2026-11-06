@@ -5,7 +5,8 @@ from __future__ import annotations
 import io
 import json
 
-from app.services import library
+from app import config
+from app.services import comfy, library
 
 from .conftest import PNG_1x1
 from .test_library import SCRIPT
@@ -135,3 +136,23 @@ def test_a_render_without_every_role_is_refused(client):
                            json={"script": "测试剧本", "role_assets": {}})
     assert response.status_code == 400
     assert "character_1" in response.get_json()["error"]
+
+
+def test_the_runs_on_disk_are_listed(client, tmp_path, monkeypatch):
+    """The live job table is in memory, so a restart empties it. The
+    renders are on disk and do not go anywhere, so they are indexed from
+    there."""
+    import json as _json
+    root = tmp_path / "comfy"
+    run = root / "output" / "h3_chains" / "sb_web_test" / "final"
+    run.mkdir(parents=True)
+    (run / "sb_web_test.mp4").write_bytes(b"movie")
+    (run.parent.parent / "manifest.json").write_text(
+        _json.dumps({"shots": [{"id": "scene_01"}]}), encoding="utf-8")
+    monkeypatch.setattr(config, "COMFYUI_ROOT", root)
+
+    runs = comfy.recent_runs()
+    assert len(runs) == 1
+    assert runs[0]["run_name"] == "sb_web_test"
+    assert runs[0]["status"] == "success"
+    assert runs[0]["video"].endswith("sb_web_test.mp4")

@@ -14,6 +14,7 @@ call itself.
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 import uuid
@@ -107,11 +108,37 @@ def job(job_id: str) -> dict:
 
 
 def jobs() -> list[dict]:
-    """Every job this process has started, newest first."""
+    """Every job this process has started, newest first, plus the runs
+    that are already on disk.
+
+    The live table is in memory, so a restart empties it - but the renders
+    are on disk and do not go anywhere. They are indexed from the chain
+    directory, so the page keeps showing what was made.
+    """
     with _jobs_lock:
         records = list(_jobs.values())
     records.sort(key=lambda r: r.get("submitted_at", 0), reverse=True)
-    return [job(r["job_id"]) for r in records]
+    live = [job(r["job_id"]) for r in records]
+
+    known = {r["run_name"] for r in live}
+    for run in comfy.recent_runs():
+        if run["run_name"] in known:
+            continue
+        live.append({
+            # A synthetic id: the disk runs have no prompt id, and an
+            # empty one would collide in the page's x-for key.
+            "job_id": "disk:" + run["run_name"],
+            "run_name": run["run_name"],
+            "status": run["status"],
+            "script": "",
+            "video": run["video"],
+            "clips": run["clips"],
+            "artifacts": ([{"name": os.path.basename(run["video"]),
+                            "relpath": run["video"], "kind": "video", "size": 0}]
+                           if run["video"] else []),
+            "from_disk": True,
+        })
+    return live
 
 
 def plan_preview(script_name: str, role_assets: dict[str, str]) -> dict:
