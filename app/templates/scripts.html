@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}剧本资产 · ComfyUI-Mie{% endblock %}
+
+{% block content %}
+<section class="panel" x-data="scriptsPage()" x-init="init()">
+  <div class="panel-head">
+    <h2>📜 剧本资产</h2>
+    <div class="panel-head-actions">
+      <button class="btn" type="button" @click="load()">🔄 刷新</button>
+      <button class="btn primary" type="button" @click="startNew()">＋ 新建</button>
+    </div>
+  </div>
+
+  <p class="muted">
+    剧本资产是 v2 契约：<code>source_script</code> 是人写的源，
+    <code>shots[].events</code> 必须与它逐字一致（含 language）。
+    保存前会跑一遍契约校验，并报出渲染风险。
+  </p>
+
+  <div class="split">
+    <div class="split-list">
+      <div class="list-scroll">
+        <template x-for="name in names" :key="name">
+          <button class="list-row" :class="{ active: name === selected }"
+                  @click="open(name)">
+            <span x-text="name"></span>
+          </button>
+        </template>
+        <p class="muted" x-show="!names.length">还没有剧本资产。</p>
+      </div>
+    </div>
+
+    <div class="split-detail">
+      <div class="card">
+        <div class="card-head">
+          <h3 x-text="selected || '（未选中）'"></h3>
+          <div class="panel-head-actions">
+            <button class="btn" type="button" @click="validate()">✔️ 校验</button>
+            <button class="btn primary" type="button" @click="save()">💾 保存</button>
+            <button class="btn danger" type="button" @click="remove()">🗑️ 删除</button>
+          </div>
+        </div>
+
+        <div class="validation-box" x-show="errors.length">
+          <strong class="err">契约不通过</strong>
+          <ul><template x-for="e in errors" :key="e"><li x-text="e"></li></template></ul>
+        </div>
+        <div class="validation-box" x-show="warnings.length">
+          <strong class="warn">渲染风险</strong>
+          <ul><template x-for="w in warnings" :key="w"><li x-text="w"></li></template></ul>
+        </div>
+        <div class="validation-box ok" x-show="okMessage" x-text="okMessage"></div>
+
+        <label class="field">
+          <span>JSON（v2）</span>
+          <textarea class="input code" rows="18" x-model="raw"></textarea>
+        </label>
+
+        <details class="preview-block" x-show="preview">
+          <summary>人读预览</summary>
+          <pre class="preview-text" x-text="preview"></pre>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

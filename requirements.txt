@@ -1,0 +1,13 @@
+# ComfyUI-Mie 短剧工作台 —— 网页端
+#
+# 纯 Python，没有 nodejs，没有构建步骤。
+#
+# 数据真源是那三个 PyPI 包：资产库与剧本契约在 mie_craft，平台与连接器在
+# mie_llm。本工作台不重写它们，只是把同样的实现摆到浏览器前面。
+flask>=3.0
+comfyui-mie-llm>=0.1.5
+comfyui-mie-prompt>=0.1.5
+comfyui-mie-craft>=0.1.5
+# 上传的图片要转成 PNG、音频要转成 WAV —— 库只收这两种字节
+pillow>=10.1.0
+soundfile>=0.12

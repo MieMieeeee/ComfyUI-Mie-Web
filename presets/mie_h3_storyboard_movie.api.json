@@ -1,0 +1,653 @@
+{
+  "85": {
+    "class_type": "MieH3LoadScriptAsset",
+    "inputs": {
+      "library_dir": "",
+      "name": "Claude的千层套路001-系列版"
+    },
+    "_meta": {
+      "title": "剧本资产 · Load Script Asset (MieH3)",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "79": {
+    "class_type": "LoadAssetV2|Mie",
+    "inputs": {
+      "kind": "character",
+      "library_dir": "",
+      "name": "小D"
+    },
+    "_meta": {
+      "title": "角色资产 · Load 小D",
+      "cnr_id": "ComfyUI_MieNodes",
+      "ver": "1"
+    }
+  },
+  "80": {
+    "class_type": "LoadAssetV2|Mie",
+    "inputs": {
+      "kind": "character",
+      "library_dir": "",
+      "name": "Claude娘"
+    },
+    "_meta": {
+      "title": "角色资产 · Load Claude娘",
+      "cnr_id": "ComfyUI_MieNodes",
+      "ver": "1"
+    }
+  },
+  "86": {
+    "class_type": "MieH3ScriptToPlan",
+    "inputs": {
+      "storyboard": [
+        "85",
+        0
+      ],
+      "character_1": [
+        "79",
+        5
+      ],
+      "character_2": [
+        "80",
+        5
+      ]
+    },
+    "_meta": {
+      "title": "剧本转计划 · Script → Plan (MieH3)",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "57": {
+    "class_type": "AssetToSlots|Mie",
+    "inputs": {
+      "assets": [
+        "86",
+        3
+      ]
+    },
+    "_meta": {
+      "title": "资产转槽位 · Asset → Slots",
+      "cnr_id": "ComfyUI_MieNodes",
+      "ver": "1"
+    }
+  },
+  "90": {
+    "class_type": "MieH3LoadAssetRoster",
+    "inputs": {
+      "library_dir": "",
+      "kind": "character"
+    },
+    "_meta": {
+      "title": "库内角色清单 · Library Roster (MieH3)",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "4": {
+    "class_type": "MiniMaxH3GenerationProfile|MieH3",
+    "inputs": {
+      "scene_continuity": "Visual continuity",
+      "audio_profile": "Generate audio"
+    },
+    "_meta": {
+      "title": "Generation Profile",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "3": {
+    "class_type": "MiniMaxH3ChainPlanModern|MieH3",
+    "inputs": {
+      "plan_json": "{\"shots\": [{\"id\": \"scene_01\", \"prompt\": [\"integrated_multimodal_description: [Shot 1] medium close up of Character 2 from <Picture 1>, already visible at the first frame, static locked-off camera maintaining the same framing, first-person POV toward the camera.\", \"Detailed two-dimensional animation with coherent linework and palette.\", \"Character 1 stays exclusively off-screen as a voice.\", \"Character 2 is the figure in <Picture 1>; use this reference for identity and appearance only.\", \"Opening cast: Character 2. Begin directly in this framing.\", \"Not visible at the opening: Character 1. Only explicit entrance events may add them.\", \"Character 2 begins at center of frame.\", \"Opening staging: Character 2 sits at the center of the sofa facing the camera, hands relaxed in the lap. Character 1 is an off-screen voice.\", \"Scene context: A living room with a beige sofa, a floor lamp, a window and a plain wall.\", \"Light: Deep night, pitch-dark outside, with warm lamplight.\", \"Only the explicitly tagged dialogue is spoken. Do not speak stage directions or role labels.\", \"Perform the following events once, in the exact written order; one speaker at a time, without overlapping or repeating lines.\", \"Each specified prop exists in its stated quantity and stays with its stated holder. An offered object stays with the offering actor until an explicit accepted handover; refusal leaves the other actor empty-handed.\", \"During dialogue-only events, keep incidental reference props with their initial holder and limit movement to natural speaking reactions.\", \"The image contains exactly the declared visible cast in the present setting. Spoken stories remain audio within this present conversation.\", \"Visible state: Character 2 is the only visible figure, seated at center with hands at rest. Character 1 remains exclusively an off-screen voice. The ordered events govern later expressions and gestures.\", \"Character 2 performs this action: Character 2 remains seated on the sofa, tilts her head slightly and listens quietly.\", \"Character 2 remains on-screen with lips completely closed while an off-screen voice (S1), adult male, casual and clear timbre, mid register, conversational pace, from Character 1 says in voiceover: <d>[English] Please help me resolve this document.</d>\", \"While this line is spoken, Character 2's lips remain completely closed.\", \"Character 2 speaks as (S2), young female, soft and playful timbre, mid-high register, intimate gentle pace with a teasing lift: <d>[Chinese] 其实，你可以和我直接用中文交流的，我不会介意的。</d> Character 2's lips move naturally with this line.\", \"Character 2 remains on-screen with lips completely closed while an off-screen voice (S1), adult male, casual and clear timbre, mid register, conversational pace, from Character 1 says in voiceover: <d>[English] wait, i'm not Chinese.</d>\", \"While this line is spoken, Character 2's lips remain completely closed.\", \"Character 2 speaks as (S2), young female, soft and playful timbre, mid-high register, intimate gentle pace with a teasing lift: <d>[Chinese] 哎呀，我都上架中文了，相信我，好吗。</d> Character 2's lips move naturally with this line.\", \"Character 2 remains on-screen with lips completely closed while an off-screen voice (S1), adult male, casual and clear timbre, mid register, conversational pace, from Character 1 says in voiceover: <d>[Chinese] 真的吗？</d>\", \"While this line is spoken, Character 2's lips remain completely closed.\", \"Character 2 speaks as (S2), young female, soft and playful timbre, mid-high register, intimate gentle pace with a teasing lift: <d>[Chinese] 哼哼，你的账号已被封禁。</d> Character 2's lips move naturally with this line.\", \"Character 2 performs this action: Character 2 closes her mouth after her final line, maintains her original seated pose and holds a sinister teasing smile briefly.\", \"overall_soundscape: Natural room tone, breathing and synchronized movement sounds.\", \"non_diegetic_music: No non-diegetic music.\"], \"length\": 430}], \"prompt_prefix\": [\"Voice casting: (S1) uses the voice identity from <Audio 1> only; the reference words are not dialogue.\", \"Voice casting: (S2) uses the voice identity from <Audio 2> only; the reference words are not dialogue.\"]}",
+      "run_name": "sb_newarch_20261106",
+      "generation_fingerprint": "v1",
+      "width": 960,
+      "height": 544,
+      "encode_mode": "video",
+      "crop": "disabled",
+      "default_duration_seconds": 10,
+      "default_steps": 20,
+      "base_seed": 0,
+      "segment_crf": 20,
+      "video_blend_frames": 0,
+      "chain_policy": [
+        "4",
+        0
+      ],
+      "plan_json_input": [
+        "86",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Production Plan",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "1": {
+    "class_type": "MiniMaxH3ChainScenePromptEditor|MieH3",
+    "inputs": {
+      "plan": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Scene Prompts",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "38": {
+    "class_type": "MiniMaxH3ChainPreflight|MieH3",
+    "inputs": {
+      "plan": [
+        "1",
+        0
+      ],
+      "start_clip": 1,
+      "scene_range": "",
+      "verify_resume_history": true
+    },
+    "_meta": {
+      "title": "MiniMax H3 Chain Preflight",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "6": {
+    "class_type": "MiniMaxH3ChainLoopStart|MieH3",
+    "inputs": {
+      "plan": [
+        "38",
+        0
+      ],
+      "start_clip": 1,
+      "scene_range": "",
+      "verify_resume_history": true
+    },
+    "_meta": {
+      "title": "Loop Start",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "15": {
+    "class_type": "MiniMaxH3ChainCurrent|MieH3",
+    "inputs": {
+      "align_audio_reference": false,
+      "state": [
+        "6",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Current Scene",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "5": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "MiniMax-H3\\minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "H3 Diffusion Model",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "20": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "MiniMax-H3\\qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "H3 Text Encoder",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "21": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "MiniMax-H3\\minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "_meta": {
+      "title": "Audio VAE",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "22": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "MiniMax-H3\\minimax_h3_video_vae_fp16.safetensors"
+    },
+    "_meta": {
+      "title": "Video VAE",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "27": {
+    "class_type": "ModelAttentionBackend",
+    "inputs": {
+      "attention": "comfy kitchen attention",
+      "model": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Model Attention Backend",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "2": {
+    "class_type": "MiniMaxH3SigmaShift",
+    "inputs": {
+      "shift_video": 12,
+      "shift_audio": 3,
+      "model": [
+        "27",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Sigma Shift",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "47": {
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "inputs": {
+      "prompt": [
+        "15",
+        4
+      ],
+      "width": [
+        "15",
+        8
+      ],
+      "height": [
+        "15",
+        9
+      ],
+      "length": [
+        "15",
+        6
+      ],
+      "ref_image_size": "match",
+      "clip": [
+        "20",
+        0
+      ],
+      "vae": [
+        "22",
+        0
+      ],
+      "audio_vae": [
+        "21",
+        0
+      ],
+      "ref_images.ref_image_0": [
+        "57",
+        1
+      ],
+      "ref_audios.ref_audio_0": [
+        "57",
+        11
+      ],
+      "ref_audios.ref_audio_1": [
+        "57",
+        12
+      ]
+    },
+    "_meta": {
+      "title": "MiniMax H3 Reference to Video",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "24": {
+    "class_type": "MiniMaxH3ChainContext|MieH3",
+    "inputs": {
+      "state": [
+        "15",
+        0
+      ],
+      "conditioning": [
+        "47",
+        0
+      ],
+      "vae": [
+        "22",
+        0
+      ],
+      "latent": [
+        "47",
+        1
+      ],
+      "audio_vae": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Apply Scene Context",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "13": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "17",
+        0
+      ],
+      "guider": [
+        "16",
+        0
+      ],
+      "sampler": [
+        "18",
+        0
+      ],
+      "sigmas": [
+        "19",
+        0
+      ],
+      "latent_image": [
+        "24",
+        3
+      ]
+    },
+    "_meta": {
+      "title": "Sample Video + Audio",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "16": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "2",
+        0
+      ],
+      "conditioning": [
+        "24",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Basic Guider",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "17": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": [
+        "15",
+        5
+      ]
+    },
+    "_meta": {
+      "title": "Scene Seed",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "18": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "Sampler",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "19": {
+    "class_type": "BasicScheduler",
+    "inputs": {
+      "scheduler": "simple",
+      "steps": [
+        "15",
+        7
+      ],
+      "denoise": 1,
+      "model": [
+        "2",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Sampling Schedule",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "11": {
+    "class_type": "VAEDecodeAudio",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecode Audio",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "12": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "22",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecode",
+      "cnr_id": "comfy-core",
+      "ver": "1"
+    }
+  },
+  "23": {
+    "class_type": "MiniMaxH3LoopTrim|MieH3",
+    "inputs": {
+      "trim_frames": [
+        "24",
+        1
+      ],
+      "fps": 24,
+      "match_tail": true,
+      "audio_trim_mode": "sync_with_video",
+      "images": [
+        "12",
+        0
+      ],
+      "audio": [
+        "11",
+        0
+      ],
+      "state": [
+        "15",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Trim Carried Overlap",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "25": {
+    "class_type": "MiniMaxH3ChainSegmentSave|MieH3",
+    "inputs": {
+      "state": [
+        "15",
+        0
+      ],
+      "images": [
+        "23",
+        0
+      ],
+      "sampled_latent": [
+        "13",
+        0
+      ],
+      "audio": [
+        "23",
+        1
+      ],
+      "images_with_overlap": [
+        "23",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "Save Segment + Checkpoint",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "26": {
+    "class_type": "MiniMaxH3ChainReview|MieH3",
+    "inputs": {
+      "enabled": false,
+      "play_notification_sound": false,
+      "auto_continue_timeout_minutes": 0,
+      "unload_models_while_waiting": false,
+      "assemble_partial_on_stop": true,
+      "partial_audio_source": "checkpointed",
+      "state": [
+        "15",
+        0
+      ],
+      "segment": [
+        "25",
+        0
+      ],
+      "audio": [
+        "23",
+        1
+      ],
+      "candidate_count": 1,
+      "review_each_candidate": false
+    },
+    "_meta": {
+      "title": "Review Candidates",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "8": {
+    "class_type": "MiniMaxH3ChainLoopEnd|MieH3",
+    "inputs": {
+      "between_scene_cleanup": "off",
+      "execution_mode": "recursive",
+      "flow": [
+        "6",
+        0
+      ],
+      "state": [
+        "15",
+        0
+      ],
+      "images": [
+        "23",
+        0
+      ],
+      "sampled_latent": [
+        "13",
+        0
+      ],
+      "segment": [
+        "26",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Loop End",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "7": {
+    "class_type": "MiniMaxH3ChainAssemble|MieH3",
+    "inputs": {
+      "audio_source": "plan",
+      "filename": "sb_newarch_20261106_%date:yyyy-MM-dd%",
+      "audio_bitrate": 256,
+      "copy_to_output": true,
+      "output_subfolder": "live_storyboards",
+      "blend_schedule": "plan",
+      "boundary_tone_match": "off",
+      "color_stabilization": "off",
+      "delete_checkpoints_after_assembly": false,
+      "generated_audio_join": "av_overlap",
+      "video-preview": "",
+      "manifest": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Assemble Final Video",
+      "cnr_id": "comfyui-minimaxh3-contex-loop",
+      "ver": "1"
+    }
+  },
+  "50": {
+    "class_type": "ShowAndSaveAnything|Mie",
+    "inputs": {
+      "save_to_log": true,
+      "log_file_name": "show_anything.log",
+      "displaytext": "新架构工作流 · New-architecture workflow\n\n剧本 → 计划：MieH3LoadScriptAsset → MieH3ScriptToPlan（引擎侧，零 LLM，与 MieNodes 共用同一个 builder）\n链路：全部走 |MieH3 节点，即引擎自己的实现，而不是上游的\n\n旧工作流（mie_nodes_movie.json）用 MieNodes 的生成器 + 上游节点；这一版只换架构，镜头内容不变，可以直接对比。",
+      "anything": [
+        "86",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Show And Save Anything 🐑",
+      "cnr_id": "ComfyUI_MieNodes",
+      "ver": "1"
+    }
+  },
+  "53": {
+    "class_type": "AboutAuthorNode|Mie",
+    "inputs": {},
+    "_meta": {
+      "title": "About Author 🐑",
+      "cnr_id": "ComfyUI_MieNodes",
+      "ver": "1"
+    }
+  }
+}

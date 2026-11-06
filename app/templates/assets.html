@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}角色与场景资产 · ComfyUI-Mie{% endblock %}
+
+{% block content %}
+<section class="panel" x-data="assetsPage()" x-init="init()">
+  <div class="panel-head">
+    <h2>🎨 角色与场景资产</h2>
+    <div class="panel-head-actions">
+      <span class="muted" x-text="libraryDir"></span>
+      <button class="btn" type="button" @click="load()">🔄 刷新</button>
+      <button class="btn primary" type="button" @click="startNew()">＋ 新建</button>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- 左：列表 -->
+    <div class="split-list">
+      <div class="filter-bar">
+        <button class="pill" :class="{ active: kind === 'character' }"
+                @click="kind = 'character'">角色</button>
+        <button class="pill" :class="{ active: kind === 'scene' }"
+                @click="kind = 'scene'">场景</button>
+      </div>
+      <div class="list-scroll">
+        <template x-for="item in items" :key="item.name">
+          <button class="list-row" :class="{ active: item.name === selected }"
+                  @click="open(item.name)">
+            <span x-text="item.name"></span>
+            <span class="muted small"
+                  x-text="kind === 'character'
+                    ? (item.image_count + '图 / ' + item.audio_count + '音')
+                    : (item.image_count + '图')"></span>
+          </button>
+        </template>
+        <p class="muted" x-show="!items.length">这一类还没有资产。</p>
+      </div>
+    </div>
+
+    <!-- 右：详情 -->
+    <div class="split-detail">
+      <div class="card" x-show="!editing">
+        <div class="card-head">
+          <h3 x-text="detail.name || '（未选中）'"></h3>
+          <div class="panel-head-actions">
+            <button class="btn" type="button" @click="startEdit()">✏️ 编辑</button>
+            <button class="btn danger" type="button" @click="remove()">🗑️ 删除</button>
+          </div>
+        </div>
+        <div class="preview-row">
+          <img class="preview-img" :src="detail.image || ''" alt=""
+               x-show="detail.image">
+          <p class="muted" x-show="!detail.image">没有图片。</p>
+        </div>
+        <dl class="meta-list">
+          <dt>描述</dt><dd x-text="detail.description || '（空）'"></dd>
+          <template x-if="kind === 'character'">
+            <dt>音色</dt>
+          </template>
+          <dd x-show="kind === 'character'" x-text="detail.voice || '（空）'"></dd>
+          <template x-if="kind === 'scene'">
+            <dt>环境音</dt>
+          </template>
+          <dd x-show="kind === 'scene'" x-text="detail.ambience || '（空）'"></dd>
+        </dl>
+        <p class="muted small" x-show="detail.audio_count">
+          <span x-text="detail.audio_count"></span> 段音色样本
+        </p>
+      </div>
+
+      <div class="card" x-show="editing">
+        <div class="card-head">
+          <h3 x-text="form.name || '新建'"></h3>
+          <div class="panel-head-actions">
+            <button class="btn primary" type="button" @click="save()">💾 保存</button>
+            <button class="btn" type="button" @click="cancel()">取消</button>
+          </div>
+        </div>
+        <label class="field">
+          <span>名字</span>
+          <input class="input" x-model="form.name" placeholder="角色或场景的名字">
+        </label>
+        <label class="field">
+          <span>描述</span>
+          <textarea class="input" rows="3" x-model="form.description"></textarea>
+        </label>
+        <label class="field" x-show="kind === 'character'">
+          <span>音色描述</span>
+          <input class="input" x-model="form.voice" placeholder="例如：young female, soft timbre">
+        </label>
+        <label class="field" x-show="kind === 'scene'">
+          <span>环境音（英文）</span>
+          <input class="input" x-model="form.ambience" placeholder="例如：Quiet room tone">
+        </label>
+        <label class="field">
+          <span x-text="kind === 'character' ? '立绘（留空则保留原图）' : '场景图（留空则保留原图）'"></span>
+          <input class="input" type="file" accept="image/*" @change="pickImage($event)">
+        </label>
+        <label class="field" x-show="kind === 'character'">
+          <span>音色样本（留空则保留原样）</span>
+          <input class="input" type="file" accept="audio/*" @change="pickAudio($event)">
+        </label>
+        <div class="result-box" x-show="message" x-text="message"></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

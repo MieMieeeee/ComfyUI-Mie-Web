@@ -1,0 +1,1368 @@
+/*
+ * app/static/tokens.css
+ * comfyui-workbench-mie 设计 token —— 方案 B 的单一来源。
+ *
+ * 架构:
+ *   :root 顶部声明 --theme-accent-* 等品牌色变量,值取自 coral-orange 主题,
+ *   下游所有组件 (.btn-run-primary, .card-core, ...) 一律消费 var(--theme-accent-*)
+ *   而不是直接写颜色字面量。换主题时,scail2_app.py 调 _apply_theme(theme_id)
+ *   把对应主题的 --theme-* 注入到 <style>:root{}</style>,通过 gr.HTML 写到 DOM,
+ *   毫秒级响应。
+ *
+ *   主题配置文件: app/presets/themes.json (新增 / 删改都在那里)。
+ *
+ * 用法:
+ *   scail2_app.py 的 build_ui() 末尾通过 launch(css=_build_launch_css())
+ *   把整个 tokens.css + 默认主题注入样式一起传给 Gradio。
+ *   切主题靠 _apply_theme() 动态更新不可见 HTML 组件。
+ *
+ * Gradio 升级 7.x 时如果原生 .gradio-container / .gr-button 等类名漂移,
+ * 只改这个文件里的覆盖选择器即可,不必满地找颜色。
+ */
+
+:root {
+  /* Web Interface Guidelines §Dark Mode: color-scheme: dark 让浏览器原生控件
+   * (scrollbar / <select> dropdown / date picker / 表单默认背景) 走暗色 variant,
+   * 不再闪白. 项目按暗色设计 (light mode 已下线, 见 AGENTS.md), 这里固定 dark. */
+  color-scheme: dark;
+
+  /* ============================================================
+   * Theme variables —— 默认 coral-orange,运行时可被 _apply_theme 覆盖
+   * ============================================================ */
+  --theme-accent-300: #ffaa7a;
+  --theme-accent-400: #ff7f50;
+  --theme-accent-500: #ff6347;
+  --theme-accent-600: #e85030;
+  --theme-accent-glow: rgba(255, 99, 71, 0.35);
+  --theme-text-highlight: #bde4f4;
+
+  /* ---------- Surface (背景层级) ---------- */
+  --bg-app:        #0f1115;
+  --bg-panel:      #15181e;
+  --bg-card:       #1a1d23;
+  --bg-card-hover: #1f232b;
+  --bg-overlay:    #23272f;
+  --bg-input:      #0c0e12;
+
+  /* ---------- Border ---------- */
+  --border-subtle:  #252830;
+  --border-default: #2f333d;
+  --border-strong:  #4b5160;
+  --border-accent: var(--theme-accent-500);
+
+  /* ---------- Text ---------- */
+  --text-primary:   #f3f4f6;
+  --text-secondary: #c2c7d2;
+  --text-muted:     #8b909b;
+  --text-faint:     #767c8a;  /* review P1-3: 2.85 -> 4.04 on --bg-card, non-critical helper text floor */
+  --text-on-accent: #0f1115;
+
+  /* ---------- Status (语义色,跨主题稳定) ---------- */
+  --color-success:     #34d399;
+  --color-success-bg:  #0e2f24;
+  --color-error:       #f87171;
+  --color-error-bg:    #2f1414;
+  --color-warning:     #fbbf24;
+  --color-warning-bg:  #2f2510;
+  --color-info:        #60a5fa;
+  --color-info-bg:     #0e1f33;
+
+  /* ---------- Spacing scale (4px 网格) ---------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---------- Radius ---------- */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   12px;
+  --radius-pill: 9999px;
+
+  /* ---------- Shadow / elevation ---------- */
+  --shadow-sm:           0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg:           0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-accent:       0 6px 20px var(--theme-accent-glow);
+  --shadow-accent-hover: 0 10px 28px var(--theme-accent-glow);
+
+  /* ---------- Typography ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
+               "PingFang SC", "Microsoft YaHei UI", system-ui, sans-serif;
+  --font-mono: "Cascadia Code", "JetBrains Mono", "Source Code Pro", ui-monospace, monospace;
+
+  --text-xs:   12px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-lg:   16px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-loose:  1.7;
+
+  /* ---------- Motion ---------- */
+  --duration-fast:   120ms;
+  --duration-base:   200ms;
+  --duration-slow:   320ms;
+  --ease-out:        cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---------- Layout shortcut ---------- */
+  --radius-card:   var(--radius-lg);
+  --radius-button: var(--radius-md);
+  --radius-input:  var(--radius-md);
+  --shadow-card:   var(--shadow-md);
+
+  /* ---------- Z-index ---------- */
+  --z-base:    1;
+  --z-sticky:  10;
+  --z-overlay: 100;
+  --z-modal:   1000;
+  --z-toast:   2000;
+}
+
+/* review P3-7: 强制 body 背景 = --bg-app,Gradio 6 inline style 会超越 :root.dark 设置 */
+body {
+  background: var(--bg-app) !important;
+  /* Web Interface Guidelines §Touch & Interaction:
+   *   - touch-action: manipulation 消除移动端 300ms 双击延迟
+   *   - -webkit-tap-highlight-color: transparent 去掉 Android 默认蓝色 tap 高亮 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+ * Gradio 6 全局覆盖
+ * ============================================================ */
+.gradio-container {
+  max-width: 1700px !important;  /* review P2-4: 1400 too narrow on wide screens */
+  background: var(--bg-app) !important;
+  /* review 2026-07-17 排版审计组6: 整体水平边距。
+   * 原 container 无 padding, 内容直接贴浏览器窗口/外缘, "贴边"感总根源。
+   * 加 var(--space-4) 水平 padding, 左右各 16px 呼吸 (max-width 锁定不能动)。
+   *
+   * Web Interface Guidelines §Safe Areas & Layout: 叠加 env(safe-area-inset-*)
+   * 让 iPhone notch / Dynamic Island / Android punch-hole 不遮内容. 必须加在最外层
+   * .gradio-container (不能加内层卡片, 否则双重缩进). 旧浏览器 env() 求值为空, calc()
+   * 自动退化为原 padding, 零破坏. */
+  padding:
+    calc(var(--space-4) + env(safe-area-inset-top))
+    calc(var(--space-5) + env(safe-area-inset-right))
+    calc(var(--space-4) + env(safe-area-inset-bottom))
+    calc(var(--space-5) + env(safe-area-inset-left)) !important;
+}
+
+/* [步骤 8 CSS 瘦身 2026-07-21] 原 Gradio label 容器覆盖块已删除 (Flask 不需要). */
+
+/* [步骤 8 CSS 瘦身 2026-07-21] 原 :root.dark 块 (Gradio 主题变量覆盖) 已删除.
+ * Flask 版不用 Gradio 主题层, 直接消费 --bg-* / --theme-* / --text-* 等原始变量.
+ * 保留 :root 顶部的 color-scheme + theme 变量, 见文件开头. */
+
+/* ============================================================
+ * .btn-run-primary —— 主运行按钮 (🚀 开始运行 / 🔁 用相同参数再来)
+ * ============================================================ */
+.btn-run-primary {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 180px;
+  padding: var(--space-3) var(--space-6) !important;
+  background: linear-gradient(180deg, var(--theme-accent-400) 0%, var(--theme-accent-500) 100%) !important;
+  color: var(--text-on-accent) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-lg) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--theme-accent-600) !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: var(--shadow-accent) !important;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out),
+              background var(--duration-base) var(--ease-out) !important;
+}
+.btn-run-primary:hover {
+  background: linear-gradient(180deg, var(--theme-accent-300) 0%, var(--theme-accent-400) 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-accent-hover) !important;
+}
+.btn-run-primary:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.btn-run-primary:disabled,
+.btn-run-primary[disabled] {
+  background: var(--bg-overlay) !important;
+  color: var(--text-faint) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  filter: none !important;
+}
+
+/* 次按钮(📥 / 📂 / 🔍 等) */
+.btn-secondary-override {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 var(--space-4) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-button) !important;
+  cursor: pointer;
+  /* Web Interface Guidelines: Never `transition: all` — 列具体属性.
+   * :hover 只改 background / border-color / color. */
+  transition: background var(--duration-base) var(--ease-out),
+              border-color var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out);
+}
+.btn-secondary-override:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================
+ * .btn-run-secondary —— 「用相同参数再来」次操作按钮 (视觉降级)
+ * ============================================================
+ * 第四阶段 §C: 整个工作台只有「🚀 开始运行」一个绝对视觉焦点。
+ * 这里洗掉橙色高亮与 accent glow, 改成低彩度深灰底 + 微弱边框,
+ * Light Mode 下转白底灰边。刻意不用 --theme-accent-*,
+ * 否则会跟主按钮抢镜头。
+ */
+.btn-run-secondary {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 140px;
+  padding: var(--space-3) var(--space-6) !important;
+  background: var(--bg-card) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-base) !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-button) !important;
+  box-shadow: var(--shadow-sm) !important;
+  cursor: pointer;
+  transition: background var(--duration-base) var(--ease-out),
+              border-color var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out) !important;
+}
+.btn-run-secondary:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
+}
+.btn-run-secondary:active {
+  background: var(--bg-overlay) !important;
+}
+.btn-run-secondary:disabled,
+.btn-run-secondary[disabled] {
+  background: var(--bg-overlay) !important;
+  color: var(--text-faint) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+/* [步骤 8 CSS 瘦身 2026-07-21] 原 .gradio-container button.primary/.secondary
+ * 兜底块 (Gradio button variant 覆盖) 已删除. Flask 版 button 用 .btn-run-primary
+ * / .btn-secondary 类, 不走 Gradio variant. */
+
+/* ============================================================
+ * .btn-run-primary.is-running —— 运行中视觉状态
+ * ============================================================
+ * Gradio 把 run_btn.interactive = False 时,按钮进 :disabled 态,显示变灰。
+ * 单靠 :disabled 用户难以分辨按钮是"空闲"还是"跑完没成功",这里加 .is-running
+ * 类(active 态 + spinner)让"正在跑"这件事一眼看出来。
+ * 由 _run_and_format 在循环开始时给按钮 add class,跑完在 finally 移除。
+ */
+.btn-run-primary.is-running {
+  position: relative;
+  background: linear-gradient(180deg, var(--theme-accent-300) 0%, var(--theme-accent-400) 100%) !important;
+  color: var(--text-on-accent) !important;
+  cursor: progress !important;
+  box-shadow: 0 0 0 3px var(--theme-accent-glow) !important;
+  animation: btn-running-pulse 1.4s var(--ease-out) infinite;
+}
+.btn-run-primary.is-running::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: var(--space-2);
+  border: 2px solid var(--text-on-accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes btn-running-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px var(--theme-accent-glow); }
+  50%      { box-shadow: 0 0 0 6px var(--theme-accent-glow); }
+}
+
+/* :disabled 仍然负责"已结束但失败/超时"的灰显态 ——
+ * 区分:active 跑中状态:is-running 用脉冲/spinner,只 :disabled 不带 is-running
+ * 才是真的变灰(完成/失败后)。 */
+.btn-run-primary:disabled:not(.is-running),
+.btn-run-primary[disabled]:not(.is-running) {
+  background: var(--bg-overlay) !important;
+  color: var(--text-faint) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  filter: none !important;
+}
+
+/* ============================================================
+ * .card-core —— 主卡片容器 (表单 Group / 结果区)
+ * ============================================================ */
+.card-core {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-card) !important;
+  padding: var(--space-6) !important;
+  box-shadow: var(--shadow-card) !important;
+  margin-bottom: var(--space-3) !important;
+  transition: border-color var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+.card-core.is-elevated {
+  background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-hover) 100%) !important;
+  border-color: var(--border-default) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.card-core.is-accent {
+  border-left: 3px solid var(--theme-accent-500) !important;
+}
+
+/* ============================================================
+ * .custom-accordion —— 🔧 高级参数 / 📜 运行日志 Accordion
+ * ============================================================ */
+.custom-accordion {
+  background: transparent !important;
+  border: none !important;
+  border-left: 3px solid var(--theme-accent-500) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: var(--space-3) 0 !important;
+}
+.custom-accordion > .label-wrap {
+  background: transparent !important;
+  border: none !important;
+  padding: var(--space-3) var(--space-4) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-base) !important;
+  font-weight: 500 !important;
+  cursor: pointer;
+}
+.custom-accordion > .label-wrap:hover {
+  color: var(--text-primary) !important;
+  background: var(--bg-card-hover) !important;
+  border-radius: var(--radius-sm) !important;
+}
+.custom-accordion .accordion-content {
+  background: transparent !important;
+  border: none !important;
+  padding: var(--space-3) var(--space-4) var(--space-4) !important;
+}
+
+/* ============================================================
+ * .custom-dataframe —— 历史记录 Dataframe
+ * ============================================================ */
+.custom-dataframe {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden;
+}
+.custom-dataframe table {
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--text-secondary) !important;
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+.custom-dataframe thead th {
+  background: var(--bg-overlay) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  padding: var(--space-3) var(--space-4) !important;
+  text-align: left !important;
+  border-bottom: 1px solid var(--border-default) !important;
+}
+.custom-dataframe tbody tr {
+  transition: background var(--duration-fast) var(--ease-out);
+  /* review 2026-07-17 历史卡死修复: 行可点 (select handler 已加), 让用户知道能点 +
+   * 点击有即时反馈, 不再感觉"卡死"。 */
+  cursor: pointer;
+}
+.custom-dataframe tbody tr:nth-child(odd)  { background: rgba(255, 255, 255, 0.015); }
+.custom-dataframe tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.04); }
+.custom-dataframe tbody tr:hover { background: var(--bg-card-hover) !important; }
+/* 点击瞬间反馈: 按下行变色, 让用户知道点击已注册 (select 往返前的即时确认)。 */
+.custom-dataframe tbody tr:active {
+  background: var(--bg-overlay) !important;
+}
+/* 选中态: 点过的行保持高亮, 跟右侧详情对应 (不混乱)。Gradio 6 Dataframe 选中的行
+ * 加 .row-selected / data-selected, 这里覆盖几种可能的标记。 */
+.custom-dataframe tbody tr.row-selected,
+.custom-dataframe tbody tr[data-selected="true"],
+.custom-dataframe tbody tr.selected {
+  background: var(--theme-accent-glow) !important;
+  border-left: 2px solid var(--theme-accent-500);
+}
+.custom-dataframe tbody td {
+  padding: var(--space-3) var(--space-4) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================================
+ * History tab —— 筛选条 + 两栏布局 + 详情卡片 + status badge
+ * (第五阶段:从 10 列扁平表 + JSON 详情,改成 6 列精简表 + 结构化卡片)
+ * ============================================================ */
+
+/* 筛选条:Preset + 状态 pills + 结果数 + 刷新 挤在一行 */
+.history-filter-bar {
+  align-items: center !important;
+  gap: var(--space-3) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-2) var(--space-4) !important;
+  margin-bottom: var(--space-3) !important;
+}
+.history-filter-bar > * { min-width: 0 !important; }
+.history-filter-preset { background: transparent !important; border: none !important; }
+.history-filter-preset .wrap > label { display: none !important; }
+.history-count {
+  color: var(--text-muted) !important;
+  font-size: var(--text-sm) !important;
+  white-space: nowrap !important;
+  align-self: center !important;
+  padding: 0 var(--space-2) !important;
+}
+.history-count p { margin: 0 !important; }
+
+/* 状态 pills (history 专用):pill 形 segmented control */
+.history-filter-status label {
+  display: inline-flex !important;
+  align-items: center !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 999px !important;
+  padding: var(--space-1) var(--space-3) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--text-secondary) !important;
+  cursor: pointer !important;
+  /* Web Interface Guidelines: Never `transition: all` — 列具体属性. */
+  transition: background var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out) !important;
+}
+.history-filter-status label:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-default) !important;
+}
+.history-filter-status label.selected {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--theme-accent-500) !important;
+  color: var(--text-primary) !important;
+  font-weight: 500;
+}
+
+/* 详情列容器:卡片底 + 圆角,和左列表视觉对齐 */
+.history-detail-col {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-4) !important;
+  min-width: 0 !important;
+}
+
+/* 详情卡片内部 */
+.detail-empty {
+  color: var(--text-muted) !important;
+  font-size: var(--text-sm) !important;
+  padding: var(--space-6) var(--space-3) !important;
+  text-align: center !important;
+  background: var(--bg-overlay) !important;
+  border-radius: var(--radius-sm) !important;
+}
+.detail-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-3) !important;
+}
+.detail-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+}
+.detail-fields {
+  display: grid !important;
+  grid-template-columns: max-content 1fr !important;
+  gap: var(--space-2) var(--space-3) !important;
+  font-size: var(--text-sm) !important;
+}
+.detail-field { display: contents !important; }
+.detail-label {
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+}
+.detail-value {
+  color: var(--text-secondary) !important;
+  word-break: break-all !important;
+  min-width: 0 !important;
+}
+.detail-value code {
+  background: var(--bg-overlay) !important;
+  padding: 1px var(--space-1) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.85em !important;
+}
+.detail-error {
+  color: var(--color-error) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.85em !important;
+  background: var(--color-error-bg) !important;
+  padding: var(--space-1) var(--space-2) !important;
+  border-radius: var(--radius-sm) !important;
+  display: inline-block !important;
+}
+.detail-prompt {
+  border-top: 1px solid var(--border-subtle) !important;
+  padding-top: var(--space-3) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--space-1) !important;
+}
+.detail-prompt-body {
+  font-size: var(--text-sm) !important;
+  color: var(--text-secondary) !important;
+  background: var(--bg-overlay) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  line-height: 1.5 !important;
+  max-height: 12em !important;
+  overflow-y: auto !important;
+}
+
+/* Status badge —— 表格里 status 列的小色块 */
+.status-badge {
+  display: inline-block !important;
+  padding: 2px var(--space-2) !important;
+  border-radius: 999px !important;
+  font-size: var(--text-xs) !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  white-space: nowrap !important;
+  border: 1px solid transparent !important;
+}
+.status-badge-success {
+  background: var(--color-success-bg) !important;
+  color: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+}
+.status-badge-failure {
+  background: var(--color-error-bg) !important;
+  color: var(--color-error) !important;
+  border-color: var(--color-error) !important;
+}
+.status-badge-timeout {
+  background: var(--color-warning-bg) !important;
+  color: var(--color-warning) !important;
+  border-color: var(--color-warning) !important;
+}
+.status-badge-running {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+  border-color: #60a5fa !important;
+}
+.status-badge-unknown {
+  background: var(--bg-overlay) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-default) !important;
+}
+
+/* Dataframe 列宽微调:status badge 不挤、prompt 截断列允许换行 */
+.custom-dataframe table td { vertical-align: middle !important; }
+.custom-dataframe table td:nth-child(2) {
+  white-space: nowrap !important;
+  min-width: 80px !important;
+}
+.custom-dataframe table td:nth-child(5) {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+/* ============================================================
+ * .nav-group —— 左侧导航 Group (review P3)
+ * ============================================================
+ * 拆分左栏为两个独立 Group (导航 / 系统), 视觉分组清晰。
+ * 用低饱和度 border 让 Group 之间有区分,但不抢主按钮焦点。
+ */
+.nav-group {
+  background: transparent !important;
+  border: none !important;
+  /* review 2026-07-17 排版审计组6: 原 padding: 0 —— "导航"标题 + 工作流列表贴 Group 边。
+   * 加 var(--space-3) 四向 padding, 让导航内容有 12px 呼吸 (跟 step-card 一致)。 */
+  padding: var(--space-3) !important;
+  margin-bottom: var(--space-3) !important;
+}
+.nav-group .prose {
+  margin: 0 0 var(--space-2) 0 !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-xs) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted) !important;
+}
+.nav-group-system {
+  margin-top: var(--space-3) !important;
+  padding-top: var(--space-3) !important;
+}
+
+/* divider: 导航/系统 两组之间的视觉分隔 */
+.nav-divider {
+  height: 1px;
+  margin: var(--space-3) 0;
+  background: linear-gradient(90deg, transparent 0%, var(--border-default) 50%, transparent 100%);
+}
+
+/* ============================================================
+ * .section-header / .preview-card / .step-card —— review P4 卡片套娃 flatten
+ * ============================================================
+ * 原结构: 输入素材 / 示例预览 都套 .card-core (粗边框 + 阴影),
+ * 跟外层 page 容器 + main panel 形成『三层卡片套娃』视觉。
+ * 现在:
+ *   - .step-card 不再加边框阴影, 只保留 section-header 风格的标题;
+ *   - .preview-card 是预览图的轻量卡片(保留必要的视觉焦点),
+ *     但去掉 card-core 的阴影, 跟外层 page 区分开但不嵌套。
+ *   - .section-header 是表单内小节标题: 13px 灰字 + 0.5px border-bottom, 既分隔又有呼吸感。
+ */
+.section-header {
+  margin: 0 0 var(--space-3) 0 !important;
+  padding-bottom: var(--space-2) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+.section-header p {
+  margin: 0 !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-base) !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: 0.01em;
+}
+.step-card {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  /* review 2026-07-17 排版审计组6: 之前四向 padding 几乎全 0, "输入素材"标题
+   * 和表单字段贴卡片边。现在四向都给 --space-3, 底部留 --space-4 拉开跟高级参数
+   * 折叠区的距离。 */
+  padding: var(--space-3) var(--space-3) var(--space-4) var(--space-3) !important;
+  margin-bottom: var(--space-3) !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+ * .preset-panels-host / .preset-panel —— preset 面板容器 (review 2026-07-14)
+ * ============================================================
+ * 架构: 9 个 preset 各预渲染到一个 gr.Group(panel-<name>, class=preset-panel),
+ * 全部放在同一个 .preset-panels-host (gr.Column) 里, 靠 visible 切换显示.
+ *
+ * 关键 bug 修复: Gradio 6 的 visible=False 只把 Group 的 height 设 0, 不移出 flex 流.
+ * host column 是 flex column + gap:16px, height=0 的隐藏 panel 之间的 gap 会累加
+ * → 越往后的工作流前面隐藏 panel 越多, 顶部空白越大 (每个 16px, 9 个可累加 ~130px).
+ * 修法: host column 的 gap 强制为 0. 同一时刻只有一个 panel 可见, gap=0 无视觉副作用.
+ */
+.preset-panels-host {
+  gap: 0 !important;
+}
+
+/* review 2026-07-17 排版审计: 页脚呼吸。
+ * .preset-panels-host gap:0 (上面那个锁定) 让限制说明页脚贴着 preset panel 底部,
+ * 无视觉缓冲。这里给页脚单独加 margin-top (host gap 不动), 让 "限制: 参考图 ≤5MB..."
+ * 跟上方表单之间有 --space-3 (12px) 呼吸。 */
+.footer-notice {
+  margin-top: var(--space-3) !important;
+}
+
+.preset-panel {
+  background: transparent !important;
+  border: none !important;
+}
+.preview-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-card) !important;
+  padding: var(--space-4) !important;
+  margin-bottom: var(--space-3) !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+ * .run-status-bar —— 顶部运行状态条 (review P2)
+ * ============================================================
+ * 贴在表单顶部,跨 idle/running/success/failure/timeout 五态切换视觉。
+ * 让『正在运行』不再只是按钮上一行字,而是占据固定条带的强视觉信号:
+ *   - running: 主题色左边框 + 脉冲动画 + spinner
+ *   - success: 绿色左边框 + check icon
+ *   - failure: 红色左边框 + x icon
+ *   - timeout: 黄色左边框 + 时钟 icon
+ *   - idle:    灰色低饱和度, 提示用户『可点击下方按钮开始』
+ * 视觉上『低姿态但始终在画面顶部』, 用户瞄一眼就知道现在是什么状态 → review P2 副标题 1。
+ */
+.run-status-container {
+  margin-bottom: var(--space-3) !important;
+}
+.run-status-bar {
+  /* display: flex 不加 !important: 新 Flask/Alpine 应用里 Alpine x-show 会用 inline display:none
+     隐藏 idle 状态的状态条, 加上 !important 会打败 inline style
+     导致 idle 时也能看到一个空框。这是旧 Gradio 应用的遗留, 现在只有 Gradio 备份尝试走这个选择器 */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-left: 3px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--text-secondary) !important;
+  min-height: 44px;
+  transition: border-color var(--duration-base) var(--ease-out),
+              background var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out);
+}
+.run-status-icon {
+  font-size: var(--text-lg);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.run-status-bar.run-status-running .run-status-icon {
+  animation: run-status-spin 1.4s linear infinite;
+  display: inline-block;
+}
+.run-status-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+.run-status-msg {
+  color: var(--text-muted);
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.run-status-elapsed {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  padding: 2px var(--space-2);
+  background: var(--bg-overlay);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+/* review 2026-07-21 进度区域重构: task 清单取代百分比胶囊。
+ * 之前 P0/P2/P3 在这里渲服 ‘’60%’ 胶囊 —— 那跟 gr.Progress 在作品预览那条
+ * 进度条上已经显示过的信息, 重复。改成 task 清单: 每个 task 一行 (icon · text · detail),
+ * 跟 .run-status-elapsed 同套颜变量 (主题色高亮), 让用户能看清
+ * ‘现在做哪一步 / 前面几步完成没’, 进度条归作品预览独占。
+ * 位置: header (icon · label) + elapsed 在第一行, task_list 全宽换到第二行;
+ * hint 仍走 flex-basis:100% 换第三行。 */
+.run-status-tasks {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.run-status-task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  min-height: 22px;
+}
+.run-status-task-icon {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  font-size: var(--text-sm);
+  line-height: 1;
+  color: var(--text-faint);
+}
+.run-status-task-text {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.run-status-task-detail {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--theme-accent-300);
+  padding-left: var(--space-1);
+}
+/* done: 文本 + 图标及色 (完成感, 不抢当前任务视觉) */
+.run-status-task-done .run-status-task-text {
+  color: var(--text-faint);
+}
+.run-status-task-done .run-status-task-icon {
+  color: var(--color-success);
+  opacity: 0.7;
+}
+.run-status-task-done .run-status-task-detail {
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+/* current: 主任务高亮 + 图标旋转, 让“正在做这一步”一眼可见 */
+.run-status-task-current .run-status-task-text {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.run-status-task-current .run-status-task-icon {
+  color: var(--theme-accent-400);
+  animation: run-status-spin 1.4s linear infinite;
+  display: inline-block;
+}
+.run-status-task-current .run-status-task-detail {
+  color: var(--theme-accent-300);
+}
+/* pending: 还没到的任务, 最暗 */
+.run-status-task-pending .run-status-task-text {
+  color: var(--text-faint);
+  opacity: 0.6;
+}
+.run-status-task-pending .run-status-task-icon {
+  opacity: 0.6;
+}
+/* failed: 错误色, 跟 .run-status-failure 状态条左边框同色 */
+.run-status-task-failed .run-status-task-text {
+  color: var(--color-error);
+}
+.run-status-task-failed .run-status-task-icon {
+  color: var(--color-error);
+}
+.run-status-task-failed .run-status-task-detail {
+  color: var(--color-error);
+  opacity: 0.8;
+}
+
+/* idle */
+.run-status-bar.run-status-idle {
+  border-left-color: var(--border-default);
+  color: var(--text-muted);
+}
+.run-status-bar.run-status-idle .run-status-label {
+  color: var(--text-secondary);
+}
+
+/* running */
+.run-status-bar.run-status-running {
+  border-left-color: var(--theme-accent-500);
+  background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-card-hover) 100%) !important;
+  color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--theme-accent-glow);
+  animation: run-status-pulse 2s var(--ease-out) infinite;
+}
+.run-status-bar.run-status-running .run-status-elapsed {
+  color: var(--theme-accent-300);
+  border: 1px solid var(--theme-accent-glow);
+}
+@keyframes run-status-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--theme-accent-glow); }
+  50%      { box-shadow: 0 0 0 6px var(--theme-accent-glow); }
+}
+@keyframes run-status-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* success */
+.run-status-bar.run-status-success {
+  border-left-color: var(--color-success);
+  background: var(--color-success-bg) !important;
+}
+.run-status-bar.run-status-success .run-status-label {
+  color: var(--color-success);
+}
+
+/* failure */
+.run-status-bar.run-status-failure {
+  border-left-color: var(--color-error);
+  background: var(--color-error-bg) !important;
+}
+.run-status-bar.run-status-failure .run-status-label {
+  color: var(--color-error);
+}
+
+/* timeout */
+.run-status-bar.run-status-timeout {
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-bg) !important;
+}
+.run-status-bar.run-status-timeout .run-status-label {
+  color: var(--color-warning);
+}
+
+/* Light mode 微调 .run-status-bar 的已耗时颜色 —— 合并到主 light mode 块, 避免 _extract_at_rule_block 找到错块 */
+/* ============================================================
+ * .sizes-cards —— 「尺寸选项」多选卡片
+ * ============================================================
+ * 复用 .custom-radio 的卡片视觉,但换成 multi-select(checkbox-group)。
+ *
+ * 关键点: Gradio 的 CheckboxGroup fieldset 默认被 .form/.styler/gr-group 收缩到
+ * ~280px min-content,祖先链上每层都 display:flex + flex:0 1 auto。试图通过 CSS 强制
+ * 100% 宽 都因祖先 flex 容器自身不扩而失败。
+ *
+ * 稳定方案: 不去对抗祖先链,而是在 fieldset 自身层把内容强制换行成多列。
+ * inline-size: 100% 配合 white-space 灵活 + 子 label 用 min-width 决定一行几个,
+ * 列数自动按可用宽度计算 → 不依赖祖先链传宽度,改个 min-width 就能调密度。
+ *
+ * 视觉:每个 option 是独立卡片(背景 + 边框 + padding),
+ * hover 状态变 bg-card-hover + border-strong,
+ * 选中态用主题色边框 + glow。
+ */
+.sizes-cards {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  gap: var(--space-2) !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  /* 把 Gradio fieldset 的 min-width 限解开,允许卡片按可用空间自动多列 */
+  min-width: 100% !important;
+  /* inline-size 是 fieldset 不被 grid 父容器截断的关键 */
+  inline-size: 100% !important;
+  max-inline-size: 100% !important;
+}
+.sizes-cards label {
+  display: flex !important;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 38px;
+  min-width: 160px;
+  /* flex: 1 1 160px 允许卡片在宽列里平均分摊 (e.g. 4 列),窄列里 1 列 */
+  flex: 1 1 160px;
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3) !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+.sizes-cards label:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+.sizes-cards label.selected,
+.sizes-cards input:checked + span {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--theme-accent-500) !important;
+  color: var(--text-primary) !important;
+  font-weight: 500;
+  box-shadow: 0 0 0 2px var(--theme-accent-glow) !important;
+}
+.sizes-cards input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+ * .custom-radio —— 左侧工作流导航 Radio
+ * ============================================================ */
+.custom-radio {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.custom-radio .wrap {
+  gap: var(--space-2) !important;
+}
+.custom-radio label {
+  display: flex !important;
+  align-items: center;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-left: 3px solid transparent !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-2) var(--space-3) !important;  /* review P2-6: drop vertical to 8px after P0-2 */
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  cursor: pointer;
+  /* Web Interface Guidelines: Never `transition: all` — 列具体属性.
+   * :hover 改 background / border-color / border-left-color / color. */
+  transition: background var(--duration-base) var(--ease-out),
+              border-color var(--duration-base) var(--ease-out),
+              border-left-color var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out);
+}
+.custom-radio label:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+.custom-radio label.selected,
+.custom-radio input:checked + span {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--border-default) !important;
+  border-left-color: var(--theme-accent-500) !important;
+  color: var(--text-primary) !important;
+  font-weight: 500;
+}
+
+/* ============================================================
+ * .error-banner —— 失败 / 超时红条
+ * ============================================================ */
+.error-banner {
+  background: var(--color-error-bg) !important;
+  border: 1px solid var(--color-error) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  margin: var(--space-2) 0 !important;
+}
+.error-banner-inner {
+  color: var(--color-error) !important;
+  font-size: var(--text-base);
+}
+.error-banner-inner b { color: var(--color-error) !important; }
+/* 复制错误信息按钮 —— 错误条内右对齐, 不抢原文焦点. */
+.error-copy-btn {
+  margin-top: var(--space-2) !important;
+  padding: var(--space-1) var(--space-3) !important;
+  background: transparent !important;
+  border: 1px solid var(--color-error) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--color-error) !important;
+  font-size: var(--text-xs) !important;
+  cursor: pointer !important;
+  display: block !important;
+  margin-left: auto !important;
+}
+.error-copy-btn:hover:not(:disabled) { background: var(--color-error) !important; color: var(--bg-input) !important; }
+.error-copy-btn:disabled { opacity: 0.6 !important; cursor: default !important; }
+
+/* ============================================================
+ * .file-fallback —— 未知文件类型 banner
+ * ============================================================ */
+.file-fallback {
+  color: var(--text-muted) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  border: 1px dashed var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  margin: var(--space-1) 0 !important;
+  background: var(--bg-overlay) !important;
+}
+.file-fallback a {
+  color: var(--theme-accent-400) !important;
+  text-decoration: underline;
+}
+.file-fallback a:hover { color: var(--theme-accent-300) !important; }
+
+/* ============================================================
+ * .result-area —— 输出区 (视频 / 图片 / 文本容器)
+ * ============================================================ */
+.result-area {
+  min-height: 300px;
+  padding: var(--space-2) 0 !important;
+}
+
+/* 输入框细节 */
+.gradio-container input[type="text"],
+.gradio-container textarea {
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-input) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  line-height: var(--leading-normal) !important;
+  transition: border-color var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+/* Web Interface Guidelines §Focus States: 用 :focus-visible 而不是 :focus ——
+ * 鼠标点击不留 ring, 键盘 tab 才显示. outline: none 由 box-shadow ring 替代. */
+.gradio-container input[type="text"]:focus-visible,
+.gradio-container textarea:focus-visible {
+  outline: none !important;
+  border-color: var(--theme-accent-500) !important;
+  box-shadow: 0 0 0 3px var(--theme-accent-glow) !important;
+}
+
+
+/* ============================================================
+ * gr.File / gr.UploadButton —— 素材拖拽区
+ * ============================================================
+ * Gradio 6 默认样式是粗灰虚线 + 灰色拖拽提示。改造目标:
+ *   - 非激活态用克制的次级 border + 透明背景,不打扰视觉
+ *   - 激活/拖入态用 --theme-accent-400 虚线 + 微 glow,主色明确但不刺眼
+ *   - 拖拽文字降一档色阶,跟暗背景完美消隐
+ */
+.file-dropzone {
+  background: var(--bg-card) !important;
+  border: 1px dashed var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  padding: var(--space-6) !important;
+  /* Web Interface Guidelines: Never `transition: all` — 列具体属性.
+   * :hover / :focus-within / .is-dragover 改 background / border-color / color / box-shadow. */
+  transition: background var(--duration-base) var(--ease-out),
+              border-color var(--duration-base) var(--ease-out),
+              color var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out) !important;
+}
+.file-dropzone:hover,
+.file-dropzone:focus-within,
+.file-dropzone.is-dragover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--theme-accent-400) !important;
+  border-style: dashed !important;
+  color: var(--text-secondary) !important;
+  box-shadow: 0 0 0 3px var(--theme-accent-glow) !important;
+}
+.file-dropzone svg,
+.file-dropzone .icon {
+  color: var(--text-faint) !important;
+  transition: color var(--duration-base) var(--ease-out);
+}
+.file-dropzone:hover svg,
+.file-dropzone:hover .icon,
+.file-dropzone.is-dragover svg {
+  color: var(--theme-accent-400) !important;
+}
+/* Gradio 6 的实际 file 上传组件 wrapper (退化覆盖) */
+.gradio-container .file,
+.gradio-container [data-testid="file"] {
+  background: var(--bg-card) !important;
+  border: 1px dashed var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  transition: border-color var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out);
+}
+.gradio-container .file:hover,
+.gradio-container [data-testid="file"]:hover {
+  border-color: var(--theme-accent-400) !important;
+  box-shadow: 0 0 0 3px var(--theme-accent-glow) !important;
+}
+
+/* ============================================================
+ * gr.Progress —— 进度条 (槽 + 进度 + 文字)
+ * ============================================================
+ * 默认 Gradio 进度条是亮色轨道 + 蓝色填充,跟暗色主题违和。
+ * 改造:
+ *   - 轨道用卡片色,几乎隐于背景
+ *   - 推进槽用主题色双段渐变,跨主题同步视觉彩度
+ *   - 文字 (百分比 + 步骤名) 用 --theme-text-highlight,在长视频
+ *     任务里跟当前主题绝对同步
+ */
+.progress-track {
+  background: var(--bg-overlay) !important;
+  border-radius: var(--radius-pill) !important;
+  height: 8px !important;
+  overflow: hidden;
+  border: none !important;
+}
+.progress-bar {
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent-400) 0%,
+    var(--theme-accent-500) 100%
+  ) !important;
+  border-radius: var(--radius-pill) !important;
+  height: 100% !important;
+  transition: width var(--duration-slow) var(--ease-out) !important;
+  box-shadow: 0 0 8px var(--theme-accent-glow) !important;
+}
+.progress-text {
+  color: var(--theme-text-highlight) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+}
+/* Gradio 6 原生 <progress> 元素退化覆盖 */
+.gradio-container progress {
+  background: var(--bg-overlay) !important;
+  border: none !important;
+  border-radius: var(--radius-pill) !important;
+  height: 8px !important;
+  overflow: hidden;
+  appearance: none;
+}
+.gradio-container progress::-webkit-progress-bar {
+  background: var(--bg-overlay) !important;
+  border-radius: var(--radius-pill) !important;
+}
+.gradio-container progress::-webkit-progress-value {
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent-400) 0%,
+    var(--theme-accent-500) 100%
+  ) !important;
+  border-radius: var(--radius-pill) !important;
+}
+.gradio-container progress::-moz-progress-bar {
+  background: linear-gradient(
+    90deg,
+    var(--theme-accent-400) 0%,
+    var(--theme-accent-500) 100%
+  ) !important;
+  border-radius: var(--radius-pill) !important;
+}
+.gradio-container .progress-text,
+.gradio-container [class*="progress"] {
+  color: var(--theme-text-highlight) !important;
+  font-weight: 500 !important;
+}
+
+/* ============================================================
+ * gr.Markdown —— 排版 + annotation 模式
+ * ============================================================
+ * - h1/h2/h3 用 text-primary,字距松一档
+ * - 行内 code 用 bg-overlay + accent 文字,跟主题色同步
+ * - .annotation-block 是给 Recipe / 警告 / 提示用的统一视觉 pattern
+ *   (左 border + radius-sm + 卡片底)。
+ *   同组选择器包含 .annotation-block / .prose blockquote (Markdown 原生 > 引用)
+ *   / .markdown-section blockquote / .gradio-container blockquote / 裸 blockquote,
+ *   任何 Markdown 容器内的引用块都会自动套用。
+ */
+.gradio-container .prose h1,
+.gradio-container h1 {
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+  margin: var(--space-6) 0 var(--space-4) !important;
+}
+.gradio-container .prose h2,
+.gradio-container h2 {
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-xl) !important;
+  font-weight: 600 !important;
+  margin: var(--space-3) 0 var(--space-3) !important;
+}
+.gradio-container .prose h3,
+.gradio-container h3 {
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-lg) !important;
+  font-weight: 600 !important;
+  margin: var(--space-4) 0 var(--space-2) !important;
+}
+/* review 2026-07-17 排版审计: emoji baseline + 文字行高修正。
+ * Windows Segoe UI Emoji 默认 baseline 偏高, 🚀/📥/🔄/🎬 跟汉字/英文基线不齐
+ * ("看不出哪里不对但别扭")。给所有含 emoji 的文字容器 (按钮/标签/标题/状态条) 统一:
+ *   - line-height: --leading-normal (1.5, 给 emoji 留垂直空间, 不挤)
+ *   - vertical-align: -0.15em (把 inline 内容往下拉, emoji 跟文字 baseline 对齐)
+ * 选不到 emoji 字形本身, 用容器级规则近似 (容器内所有 inline 内容统一对齐)。 */
+.gradio-container button,
+.gradio-container label,
+.gradio-container .section-header,
+.gradio-container .run-status-bar,
+.gradio-container h1,
+.gradio-container h2,
+.gradio-container h3 {
+  line-height: var(--leading-normal);
+  vertical-align: -0.15em;
+}
+.gradio-container .prose code,
+.gradio-container code,
+.gradio-container .prose :not(pre) > code {
+  background: var(--bg-overlay) !important;
+  color: var(--theme-accent-300) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.92em !important;
+  padding: 2px 6px !important;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+.gradio-container .prose pre,
+.gradio-container pre {
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-4) !important;
+  overflow-x: auto;
+}
+.gradio-container .prose pre code,
+.gradio-container pre code {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-secondary) !important;
+  padding: 0 !important;
+}
+
+/* annotation 模式 —— Recipe / 警告 / 提示统一视觉 */
+.annotation-block {
+  background: var(--bg-overlay) !important;
+  border-left: 3px solid var(--theme-accent-400) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  margin: var(--space-3) 0 !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  line-height: var(--leading-normal);
+}
+.markdown-section blockquote,
+.prose blockquote {
+  background: var(--bg-overlay) !important;
+  border-left: 3px solid var(--theme-accent-400) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  margin: var(--space-3) 0 !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-sm) !important;
+  line-height: var(--leading-normal);
+}
+
+/* ============================================================

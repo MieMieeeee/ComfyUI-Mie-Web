@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}大模型设置 · ComfyUI-Mie{% endblock %}
+
+{% block content %}
+<section class="panel" x-data="llmPage()" x-init="init()">
+  <div class="panel-head">
+    <h2>🤖 大语言模型设置</h2>
+    <div class="panel-head-actions">
+      <span class="muted" x-text="keysFile"></span>
+      <button class="btn" type="button" @click="load()">🔄 刷新</button>
+    </div>
+  </div>
+
+  <p class="muted">
+    API Key 写进 ComfyUI 插件的 <code>mia_llm_keys.json</code>，插件的节点立刻就能用；
+    模型与「当前平台」存在本工作台自己的设置里。密钥只显示头尾，不回显全文。
+  </p>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 20%">平台</th>
+          <th style="width: 26%">接口</th>
+          <th style="width: 22%">模型</th>
+          <th style="width: 16%">Key</th>
+          <th style="width: 16%">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template x-for="p in platforms" :key="p.key + p.connector">
+          <tr :class="{ 'row-current': p.current }">
+            <td>
+              <div class="cell-strong" x-text="p.name"></div>
+              <div class="muted small" x-text="p.key + (p.host ? ' · 本地服务' : '')"></div>
+            </td>
+            <td class="small muted" x-text="p.endpoint || '—'"></td>
+            <td>
+              <select class="input" x-model="p.model"
+                      @change="saveModel(p)">
+                <template x-for="m in p.models" :key="m">
+                  <option :value="m" x-text="m"></option>
+                </template>
+                <option value="">（自定义）</option>
+              </select>
+              <input class="input" x-show="!p.models.includes(p.model)"
+                     x-model="p.model" @change="saveModel(p)"
+                     placeholder="自定义模型名">
+            </td>
+            <td>
+              <template x-if="p.host">
+                <input class="input" :value="p.host || 'http://127.0.0.1:11434'"
+                       @change="saveHost(p)" placeholder="http://host:port">
+              </template>
+              <template x-if="!p.host">
+                <div>
+                  <div class="small" :class="p.has_key ? 'ok' : 'warn'"
+                       x-text="p.has_key ? p.key_masked : '未设置'"></div>
+                  <input class="input" type="password" :value="p.has_key ? p.key_masked : ''"
+                         @change="saveKey(p)" placeholder="粘贴 API Key">
+                </div>
+              </template>
+            </td>
+            <td>
+              <button class="btn" type="button" @click="test(p)"
+                      :disabled="p.busy" x-text="p.busy ? '测试中…' : '测试连接'"></button>
+              <button class="btn subtle" type="button" @click="makeCurrent(p)"
+                      x-show="!p.current">设为当前</button>
+              <span class="badge ok" x-show="p.current">当前</span>
+            </td>
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="result-box" x-show="lastResult" x-text="lastResult"></div>
+</section>
+{% endblock %}

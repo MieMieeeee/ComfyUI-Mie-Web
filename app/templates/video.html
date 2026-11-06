@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}视频制作 · ComfyUI-Mie{% endblock %}
+
+{% block content %}
+<section class="panel" x-data="videoPage()" x-init="init()">
+  <div class="panel-head">
+    <h2>🎞️ 视频制作</h2>
+    <div class="panel-head-actions">
+      <span class="muted" x-text="statusText"></span>
+      <button class="btn" type="button" @click="refreshJobs()">🔄 刷新</button>
+    </div>
+  </div>
+
+  <p class="muted">
+    剧本 → 计划由引擎侧完成（<code>MieH3LoadScriptAsset</code> → <code>MieH3ScriptToPlan</code>），
+    链路跑 <code>|MieH3</code> 节点。角色槽位按剧本的 <code>roles</code> 顺序接线，
+    接错人等于换了张脸 —— 这里按角色逐个选。
+  </p>
+
+  <div class="split">
+    <div class="split-list">
+      <label class="field">
+        <span>剧本</span>
+        <select class="input" x-model="script" @change="loadScript()">
+          <option value="">— 选择剧本 —</option>
+          <template x-for="n in scripts" :key="n"><option :value="n" x-text="n"></option></template>
+        </select>
+      </label>
+
+      <div class="roles-block" x-show="roles.length">
+        <div class="filter-bar"><span class="muted">角色槽位</span></div>
+        <template x-for="r in roles" :key="r.id">
+          <label class="field">
+            <span>
+              <span x-text="r.name"></span>
+              <span class="muted small" x-text="r.presence === 'on_screen' ? '（出镜）' : '（画外音）'"></span>
+            </span>
+            <select class="input" x-model="r.asset" @change="preview()">
+              <option value="">— 选择资产 —</option>
+              <template x-for="c in characters" :key="c"><option :value="c" x-text="c"></option></template>
+            </select>
+          </label>
+        </template>
+      </div>
+
+      <label class="field">
+        <span>片段名（run name）</span>
+        <input class="input" x-model="runName" placeholder="留空则自动命名">
+      </label>
+      <div class="field-row">
+        <label class="field"><span>宽</span><input class="input" type="number" x-model.number="width"></label>
+        <label class="field"><span>高</span><input class="input" type="number" x-model.number="height"></label>
+        <label class="field"><span>步数</span><input class="input" type="number" x-model.number="steps"></label>
+        <label class="field"><span>目标秒</span><input class="input" type="number" x-model.number="duration"></label>
+      </div>
+
+      <button class="btn primary wide" type="button" @click="submit()"
+              :disabled="!script || !roles.length">🎬 开始渲染</button>
+      <div class="result-box" x-show="message" x-text="message"></div>
+    </div>
+
+    <div class="split-detail">
+      <div class="card" x-show="jobs.length">
+        <div class="card-head"><h3>任务</h3></div>
+        <template x-for="j in jobs" :key="j.job_id">
+          <div class="job-row">
+            <div>
+              <div class="cell-strong" x-text="j.run_name"></div>
+              <div class="muted small" x-text="j.script + ' · ' + j.status"></div>
+            </div>
+            <span class="badge" :class="j.status === 'success' ? 'ok' : (j.status === 'error' ? 'err' : 'warn')"
+                  x-text="j.status"></span>
+            <div class="job-artifacts">
+              <template x-for="a in (j.artifacts || [])" :key="a.relpath">
+                <a class="artifact" :href="'/media/' + a.relpath" target="_blank" rel="noopener"
+                   x-text="a.name"></a>
+              </template>
+            </div>
+            <p class="err small" x-show="j.error" x-text="j.error"></p>
+          </div>
+        </template>
+      </div>
+
+      <div class="card" x-show="!jobs.length">
+        <p class="muted">还没有任务。选一个剧本、给每个角色接上资产，然后开始渲染。</p>
+      </div>
+
+      <details class="preview-block" x-show="planPreview">
+        <summary>计划的角色与要求</summary>
+        <pre class="preview-text" x-text="planPreview"></pre>
+      </details>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 本机状态：设置、任务、缓存
+*.local.json
+settings.json
+.web_state/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Web Interface Guidelines: theme-color + color-scheme 让浏览器原生控件走暗 variant -->
+  <meta name="theme-color" content="{{ page_bg_color }}">
+  <meta name="color-scheme" content="dark">
+  <title>{% block title %}ComfyUI-Mie 短剧工作台{% endblock %}</title>
+
+  <!-- 主题 CSS: tokens.css (:root 变量 + 共享组件) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <style id="theme-injector">{{ theme_css_content | safe }}</style>
+
+  <!-- app.js 必须先加载, 再加载 Alpine (Alpine 启动时需要 appShell 已定义) -->
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='alpine.min.js') }}"></script>
+</head>
+<body data-theme="{{ theme_id }}" data-tab="{{ active }}" x-data="appShell()" x-init="init()">
+  <header class="app-shell-header">
+    <h1>🎬 ComfyUI-Mie 短剧工作台</h1>
+  </header>
+
+  <nav class="main-tabs">
+    <div class="main-tabs-nav">
+      <a href="{{ url_for('llm_page') }}"
+         :class="{ active: currentTab === 'llm' }">🤖 大模型</a>
+      <a href="{{ url_for('assets_page') }}"
+         :class="{ active: currentTab === 'assets' }">🎨 角色与场景</a>
+      <a href="{{ url_for('scripts_page') }}"
+         :class="{ active: currentTab === 'scripts' }">📜 剧本资产</a>
+      <a href="{{ url_for('video_page') }}"
+         :class="{ active: currentTab === 'video' }">🎞️ 视频制作</a>
+    </div>
+    <div class="main-tabs-status" x-data="{}">
+      <span class="status-pill" :class="comfyStatusClass" :title="comfyStatusTitle">
+        <span class="status-dot"></span>
+        <span class="status-text" x-text="comfyStatusShort"></span>
+      </span>
+      <a class="status-open" :href="comfyStatusUrl || '#'" target="_blank" rel="noopener"
+         :class="{ disabled: !comfyStatusUrl }" title="在 ComfyUI 里打开">↗</a>
+      <button class="status-refresh" type="button" @click="refreshStatus()" title="刷新状态">🔄</button>
+    </div>
+  </nav>
+
+  <main class="main-stage">
+    <div class="page-frame">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="app-shell-footer">
+    <span>数据真源：ComfyUI-Mie-Craft / ComfyUI-Mie-LLM · 主题复用 ComfyUIWebToRunWorkflow</span>
+  </footer>
+</body>
+</html>
